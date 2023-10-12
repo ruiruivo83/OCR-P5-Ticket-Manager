@@ -39,9 +39,13 @@ class InterventionModel
     public function createNewIntervention(): void
     {
         $stmt = $this->bdd->prepare("INSERT INTO `ticket_interventions` (`ticket_id`, `intervention_author_id`, `intervention_date`, `intervention_description`, `intervention_author_country`, `intervention_author_company`) VALUES (:ticketId, :authorId, NOW(), :description, :authorCountry, :authorCompany)");
-        $stmt->bindParam(':ticketId', $this->superGlobals->_POST("ticketid"), PDO::PARAM_INT);
+
+        $ticketid = $this->superGlobals->_POST("ticketid");
+        $stmt->bindParam(':ticketId', $ticketid, PDO::PARAM_INT);
         $stmt->bindParam(':authorId', $this->superGlobals->_SESSION("user")['id'], PDO::PARAM_INT);
-        $stmt->bindParam(':description', $this->superGlobals->_POST("Description"), PDO::PARAM_STR);
+
+        $description = $this->superGlobals->_POST("Description");
+        $stmt->bindParam(':description', $description, PDO::PARAM_STR);
         $stmt->bindParam(':authorCountry', $this->superGlobals->_SESSION("user")['country'], PDO::PARAM_STR);
         $stmt->bindParam(':authorCompany', $this->superGlobals->_SESSION("user")['company'], PDO::PARAM_STR);
         $stmt->execute();
@@ -58,16 +62,21 @@ class InterventionModel
         $stmt->execute();
     }
 
-    public function getMyInterventionsForYearAndMonth($CreationYear, $CreationMonth)
-    {
-        $currentUserId = $this->superGlobals->_SESSION("user")['id'];
-        $stmt = $this->bdd->prepare("SELECT `intervention_date` FROM `ticket_interventions` WHERE YEAR(`intervention_date`) = :year AND MONTH(`intervention_date`) = :month AND `intervention_author_id` = :userId ORDER BY `intervention_date` DESC");
-        $stmt->bindParam(':year', $CreationYear, PDO::PARAM_STR);
-        $stmt->bindParam(':month', $CreationMonth, PDO::PARAM_STR);
-        $stmt->bindParam(':userId', $currentUserId, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
+public function getMyInterventionsForYearAndMonth($CreationYear, $CreationMonth)
+{
+    $currentUserId = $this->superGlobals->_SESSION("user")['id'];
+    $year = $CreationYear; // Assign to a variable
+    $month = $CreationMonth; // Assign to a variable
+    
+    $stmt = $this->bdd->prepare("SELECT `intervention_date` FROM `ticket_interventions` WHERE YEAR(`intervention_date`) = :year AND MONTH(`intervention_date`) = :month AND `intervention_author_id` = :userId ORDER BY `intervention_date` DESC");
+    $stmt->bindParam(':year', $year, PDO::PARAM_STR); // Use the variables
+    $stmt->bindParam(':month', $month, PDO::PARAM_STR);
+    $stmt->bindParam(':userId', $currentUserId, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    return $stmt->fetchAll();
+}
+
 
     public function getMyInterventions(): array
     {
