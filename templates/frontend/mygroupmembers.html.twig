@@ -1,0 +1,79 @@
+{% extends "_layout.html.twig" %}
+
+
+{% block topbar %}
+    {{ include('/backend/user_topbar.html.twig') }}
+{% endblock %}
+
+{% block body %}
+    <div class="card m-1">
+        <div class="card-header">
+            <div class="w-100">
+                My GROUP MEMBERS
+            </div>
+
+        </div>
+        <div class="card-body p-0">
+            <div class="w-100">
+                <button type="button" class="btn btn-primary btn-sm m-1">Create Groupe</button>
+
+
+            </div>
+
+            <table id="dtBasicExample" class="table table-striped table-bordered table-sm m-0" cellspacing="0"
+                   width="100%">
+
+                <thead>
+                <tr>
+                    <th class="th-sm">Id
+                    </th>
+                    <th class="th-sm">FirstName
+                    </th>
+                    <th class="th-sm">LastName
+                    </th>
+                    <th class="th-sm">eMail
+                    </th>
+                    <th class="th-sm">Company
+                    </th>
+                    <th class="th-sm">Country
+                    </th>
+                    <th class="th-sm">Creation Date
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td class="table_text_overflow_ellipsis"> {{ result.id }}</td>
+                        <td class="table_text_overflow_ellipsis"> {{ result.firstname }}</td>
+                        <td class="table_text_overflow_ellipsis"> {{ result.lastname }}</td>
+                        <td class="table_text_overflow_ellipsis">  {{ result.email }}</td>
+                        <td class="table_text_overflow_ellipsis"> {{ result.company }}</td>
+                        <td class="table_text_overflow_ellipsis"> {{ result.country }}</td>
+                        <td class="table_text_overflow_ellipsis">  {{ result.creation_date }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th class="th-sm">Id
+                    </th>
+                    <th class="th-sm">FirstName
+                    </th>
+                    <th class="th-sm">LastName
+                    </th>
+                    <th class="th-sm">eMail
+                    </th>
+                    <th class="th-sm">Company
+                    </th>
+                    <th class="th-sm">Country
+                    </th>
+                    <th class="th-sm">Creation Date
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
+
+        </div>
+    </div>
+{% endblock %}
