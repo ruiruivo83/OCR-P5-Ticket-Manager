@@ -19,9 +19,11 @@ use Twig\Token;
  * Deprecates a section of a template.
  *
  *    {% deprecated 'The "base.twig" template is deprecated, use "layout.twig" instead.' %}
- *    {% extends 'layout.html.twig' %}
+ *    {% extends 'layout.html' %}
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
+ *
+ * @internal
  */
 final class DeprecatedTokenParser extends AbstractTokenParser
 {

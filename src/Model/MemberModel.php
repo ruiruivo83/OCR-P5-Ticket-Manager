@@ -17,14 +17,12 @@ class MemberModel
         $this->bdd = Database::getBdd();
     }
 
-    public function getGroupMembersAndDetails(int $groupid): array
+    public function getGroupMembersAndDetails(int $groupId): array
     {
-        $req = $this->bdd->prepare("SELECT * FROM group_members grp INNER JOIN users usr on usr.id = grp.user_id WHERE group_id = $groupid");
-        $req->execute();
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
-        return $req->fetchall(PDO::FETCH_CLASS, Member::class);
-    }
+        $sql = "SELECT * FROM `group_members` AS `grp` INNER JOIN `users` AS `usr` ON `usr`.`id` = `grp`.`user_id` WHERE `group_id` = ?";
+        $stmt = $this->bdd->prepare($sql);
+        $stmt->execute([$groupId]);
 
+        return $stmt->fetchAll(PDO::FETCH_CLASS, Member::class);
+    }
 }

@@ -1,0 +1,79 @@
+{% extends "_layout.html" %}
+
+
+{% block topbar %}
+    {{ include('/backend/user_topbar.html') }}
+{% endblock %}
+
+{% block body %}
+
+
+    <div class="card m-1">
+        <div class="card-header">
+            <div class="w-100">
+                <i class="fas fa-ticket-alt mr-3 fa-2x"></i>MY TICKETS
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <table id="dtBasicExample" class="table table-striped table-bordered table-sm m-0" cellspacing="0"
+                   width="100%">
+                <thead>
+                <tr>
+                    <th class="th-sm">Id
+                    </th>
+                    <th class="th-sm">Creation Date
+                    </th>
+                    <th class="th-sm">Requester
+                    </th>
+                    <th class="th-sm">Title
+                    </th>
+                    <th class="th-sm">Description
+                    </th>
+                    <th class="th-sm">Author
+                    </th>
+
+                    <th class="th-sm">
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for result in results %}
+                    <tr>
+                         <td class="table_text_overflow_ellipsis"><i class="fas fa-ticket-alt mr-3"></i> {{ result.id }}</td>
+                         <td class="table_text_overflow_ellipsis">  {{ result.creation_date }}</td>
+                         <td class="table_text_overflow_ellipsis">  {{ result.requester }}</td>
+                         <td class="table_text_overflow_ellipsis"><b> {{ result.title }} </b> </td>
+                         <td class="table_text_overflow_ellipsis"><b>  {{ result.description }} </td>
+                        <td class="table_text_overflow_ellipsis">  {{ result.author_id }} </td>
+                         <td class="table_text_overflow_ellipsis">
+                             <a class="mr-2" href="index.php?action=ticketdetails&id={{ result.id }}">Details</a>
+                             <a class="mr-2" href="index.php?action=closeticketfunction&ticketid={{ result.id }}">Close</a>
+                         </td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th class="th-sm">Id
+                    </th>
+                    <th class="th-sm">Creation Date
+                    </th>
+                    <th class="th-sm">Requester
+                    </th>
+                    <th class="th-sm">Title
+                    </th>
+                    <th class="th-sm">Description
+                    </th>
+                    <th class="th-sm">Author
+                    </th>
+
+                    <th class="th-sm">
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+{% endblock %}

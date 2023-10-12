@@ -11,7 +11,6 @@ use App\Model\Entity\Intervention;
 
 class InterventionModel
 {
-
     private $bdd;
     private $superGlobals;
 
@@ -23,63 +22,62 @@ class InterventionModel
 
     public function getInterventionForTicketId(int $id): array
     {
-        $req = $this->bdd->prepare("SELECT * FROM ticket_interventions WHERE ticket_id = ? ORDER BY intervention_date DESC");
-        $req->execute(array($id));
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
-        return $req->fetchall(PDO::FETCH_CLASS, Intervention::class);
+        $stmt = $this->bdd->prepare("SELECT * FROM `ticket_interventions` WHERE `ticket_id` = :ticketId ORDER BY `intervention_date` DESC");
+        $stmt->bindParam(':ticketId', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_CLASS, Intervention::class);
     }
 
     public function getInterventionsForTicketIdAndAuthorDetails(int $ticketId): array
     {
-        $req = $this->bdd->prepare("SELECT * FROM ticket_interventions tktinter INNER JOIN users usr on usr.id = tktinter.intervention_author_id WHERE tktinter.ticket_id = '$ticketId' ORDER BY intervention_date DESC");
-        $req->execute(array($ticketId));
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
-        return $req->fetchall(PDO::FETCH_CLASS, Intervention::class);
+        $stmt = $this->bdd->prepare("SELECT * FROM `ticket_interventions` `tktinter` INNER JOIN `users` `usr` ON `usr`.`id` = `tktinter`.`intervention_author_id` WHERE `tktinter`.`ticket_id` = :ticketId ORDER BY `intervention_date` DESC");
+        $stmt->bindParam(':ticketId', $ticketId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_CLASS, Intervention::class);
     }
 
     public function createNewIntervention(): void
     {
-        $req = $this->bdd->prepare("INSERT INTO ticket_interventions(ticket_id, intervention_author_id, intervention_date, intervention_description, intervention_author_country, intervention_author_company) values (?, ?, NOW(), ?, ?, ?) ");
-        $req->execute(array($this->superGlobals->_POST("ticketid"), $this->superGlobals->_SESSION("user")['id'], $this->superGlobals->_POST("Description"), $this->superGlobals->_SESSION("user")['country'], $this->superGlobals->_SESSION("user")['company']));
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
+        $stmt = $this->bdd->prepare("INSERT INTO `ticket_interventions` (`ticket_id`, `intervention_author_id`, `intervention_date`, `intervention_description`, `intervention_author_country`, `intervention_author_company`) VALUES (:ticketId, :authorId, NOW(), :description, :authorCountry, :authorCompany)");
+        $stmt->bindParam(':ticketId', $this->superGlobals->_POST("ticketid"), PDO::PARAM_INT);
+        $stmt->bindParam(':authorId', $this->superGlobals->_SESSION("user")['id'], PDO::PARAM_INT);
+        $stmt->bindParam(':description', $this->superGlobals->_POST("Description"), PDO::PARAM_STR);
+        $stmt->bindParam(':authorCountry', $this->superGlobals->_SESSION("user")['country'], PDO::PARAM_STR);
+        $stmt->bindParam(':authorCompany', $this->superGlobals->_SESSION("user")['company'], PDO::PARAM_STR);
+        $stmt->execute();
     }
 
     public function createClosingIntervention($ticketId, $interventionDescription): void
     {
-        $req = $this->bdd->prepare("INSERT INTO ticket_interventions(ticket_id, intervention_author_id, intervention_date, intervention_description, intervention_author_country, intervention_author_company) values (?, ?, NOW(), ?, ?, ?) ");
-        $req->execute(array($ticketId, $this->superGlobals->_SESSION("user")['id'], $interventionDescription, $this->superGlobals->_SESSION("user")['country'], $this->superGlobals->_SESSION("user")['company']));
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
+        $stmt = $this->bdd->prepare("INSERT INTO `ticket_interventions` (`ticket_id`, `intervention_author_id`, `intervention_date`, `intervention_description`, `intervention_author_country`, `intervention_author_company`) VALUES (:ticketId, :authorId, NOW(), :description, :authorCountry, :authorCompany)");
+        $stmt->bindParam(':ticketId', $ticketId, PDO::PARAM_INT);
+        $stmt->bindParam(':authorId', $this->superGlobals->_SESSION("user")['id'], PDO::PARAM_INT);
+        $stmt->bindParam(':description', $interventionDescription, PDO::PARAM_STR);
+        $stmt->bindParam(':authorCountry', $this->superGlobals->_SESSION("user")['country'], PDO::PARAM_STR);
+        $stmt->bindParam(':authorCompany', $this->superGlobals->_SESSION("user")['company'], PDO::PARAM_STR);
+        $stmt->execute();
     }
 
-    // GET ALL OPEN INTERVENTIONS THIS MONTH
     public function getMyInterventionsForYearAndMonth($CreationYear, $CreationMonth)
     {
         $currentUserId = $this->superGlobals->_SESSION("user")['id'];
-        $req = $this->bdd->prepare("SELECT intervention_date FROM ticket_interventions WHERE YEAR(intervention_date) = '$CreationYear' AND MONTH(intervention_date) = '$CreationMonth' AND intervention_author_id = '$currentUserId' ORDER BY intervention_date DESC");
-        $req->execute();
-        // $req->debugDumpParams();
-        // die;
-        return $req->fetchall();
+        $stmt = $this->bdd->prepare("SELECT `intervention_date` FROM `ticket_interventions` WHERE YEAR(`intervention_date`) = :year AND MONTH(`intervention_date`) = :month AND `intervention_author_id` = :userId ORDER BY `intervention_date` DESC");
+        $stmt->bindParam(':year', $CreationYear, PDO::PARAM_STR);
+        $stmt->bindParam(':month', $CreationMonth, PDO::PARAM_STR);
+        $stmt->bindParam(':userId', $currentUserId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 
-    // GET ALL OPEN INTERVENTIONS THIS MONTH
     public function getMyInterventions(): array
     {
         $currentUserId = $this->superGlobals->_SESSION("user")['id'];
-        $req = $this->bdd->prepare("SELECT * FROM ticket_interventions WHERE intervention_author_id = '$currentUserId' ORDER BY intervention_date DESC");
-        $req->execute();
-        // $req->debugDumpParams();
-        // die;
-        return $req->fetchall();
+        $stmt = $this->bdd->prepare("SELECT * FROM `ticket_interventions` WHERE `intervention_author_id` = :userId ORDER BY `intervention_date` DESC");
+        $stmt->bindParam(':userId', $currentUserId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+                return $stmt->fetchAll();
     }
-
-
 }
+
+   

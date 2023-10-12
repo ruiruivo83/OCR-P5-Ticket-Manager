@@ -24,83 +24,69 @@ class UserModel
     // CREATE NEW USER
     public function createNewUser()
     {
-        $req = $this->bdd->prepare("INSERT INTO users(firstname, lastname, email, psw, creation_date, country ) values (?, ?, ?, ?, NOW(), ?) ");
-        $req->execute(array(
-                $this->superGlobals->_POST("firstname"),
-                $this->superGlobals->_POST("lastname"),
-                $this->superGlobals->_POST("email"),
-                password_hash($this->superGlobals->_POST("psw"), PASSWORD_DEFAULT),
-                $this->superGlobals->_POST("country"))
-        );
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
+        $sql = "INSERT INTO `users` (`firstname`, `lastname`, `email`, `psw`, `creation_date`, `country`) VALUES (?, ?, ?, ?, NOW(), ?)";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([
+            $this->superGlobals->_POST("firstname"),
+            $this->superGlobals->_POST("lastname"),
+            $this->superGlobals->_POST("email"),
+            password_hash($this->superGlobals->_POST("psw"), PASSWORD_DEFAULT),
+            $this->superGlobals->_POST("country")
+        ]);
     }
 
     // SEARCH USERS
     public function searchUsers(string $searchText): array
     {
-        $req = $this->bdd->prepare("SELECT * FROM users WHERE ( LOWER(firstname) Like  LOWER(?)) OR ( LOWER(lastname) like  LOWER(?)) OR  (LOWER(email) like  LOWER(?) OR  id like  ? )");
-        $req->execute(array("%" . $searchText . "%", "%" . $searchText . "%", "%" . $searchText . "%", "%" . $searchText . "%"));
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
-        return $req->fetchall(PDO::FETCH_CLASS, User::class);
+        $sql = "SELECT * FROM `users` WHERE (LOWER(`firstname`) LIKE LOWER(?)) OR (LOWER(`lastname`) LIKE LOWER(?)) OR (LOWER(`email`) LIKE LOWER(?) OR `id` LIKE ?)";
+        $req = $this->bdd->prepare($sql);
+        $req->execute(["%" . $searchText . "%", "%" . $searchText . "%", "%" . $searchText . "%", "%" . $searchText . "%"]);
+        return $req->fetchAll(PDO::FETCH_CLASS, User::class);
     }
 
     // FIND USER BY EMAIL
     // MUST NOT DECLARE A RETURN - SOLUTION: create testExistenceUserByEmail -> return bool
-    public function getUserByEmail(string $email): Array
+    public function getUserByEmail(string $email): array
     {
-        $req = $this->bdd->prepare("SELECT * FROM users WHERE email = ? ");
-        $req->execute(array($email));
+        $sql = "SELECT * FROM `users` WHERE `email` = ?";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$email]);
         $req->setFetchMode(PDO::FETCH_CLASS, 'User');
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
         return $req->fetch();
     }
 
     // FIND USER BY EMAIL
-    public function getUserById(int $id): Array
+    public function getUserById(int $id): array
     {
-        $req = $this->bdd->prepare("SELECT * FROM users WHERE id =  ?   ");
-        $req->execute(array($id));
+        $sql = "SELECT * FROM `users` WHERE `id` = ?";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$id]);
         $req->setFetchMode(PDO::FETCH_CLASS, 'User');
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
         return $req->fetch();
     }
 
     // VERIFY IF USER EMAIL EXISTS IN THE DATABASE
     public function getEmailCount($email)
     {
-        $req = $this->bdd->prepare("SELECT * FROM users WHERE email =  ?");
-        $req->execute(array($email));
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
+        $sql = "SELECT * FROM `users` WHERE `email` = ?";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$email]);
         return $req->rowCount();
     }
 
-    // ATACH PHOTO FILE NAME TO USER
-    public function atachPhotoFileNameToUser(int $userId, string $fileName): void
+    // ATTACH PHOTO FILE NAME TO USER
+    public function attachPhotoFileNameToUser(int $userId, string $fileName): void
     {
-        $req = $this->bdd->prepare("UPDATE users SET photo_filename=? WHERE id=?");
-        $req->execute(array($fileName, $userId));
-        // $req->debugDumpParams();
-        // die;
+        $sql = "UPDATE `users` SET `photo_filename` = ? WHERE `id` = ?";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$fileName, $userId]);
     }
 
-    // SAVES COUNTRY AND COMPANY IN USER PROFILE
+    // SAVE COUNTRY AND COMPANY IN USER PROFILE
     public function saveCompanyAndCountryFunction(string $country, string $company, int $userId): void
     {
-        $req = $this->bdd->prepare("UPDATE users SET country = ?, company = ? WHERE id=?");
-        $req->execute(array($country, $company, $userId));
-        // $req->debugDumpParams();
-        // die;
+        $sql = "UPDATE `users` SET `country` = ?, `company` = ? WHERE `id` = ?";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$country, $company, $userId]);
     }
-
-
 }

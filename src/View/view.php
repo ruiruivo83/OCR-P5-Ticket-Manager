@@ -33,9 +33,9 @@ class View
             // FORCES TO UPDATE PROFILE FROM DATABASE EVERY REFRESH OF THE PAGE
             $currentUser = $this->userModel->getUserById((int)$currentUser['id']);
             $data = array_merge($data, ['profile' => $currentUser]);
-            echo $this->twig->render('frontend/' . $template . '.html.twig', $data);
+            echo $this->twig->render('frontend/' . $template . '.html', $data);
         } else {
-            echo $this->twig->render('frontend/' . $template . '.html.twig', $data);
+            echo $this->twig->render('frontend/' . $template . '.html', $data);
         }
 
 

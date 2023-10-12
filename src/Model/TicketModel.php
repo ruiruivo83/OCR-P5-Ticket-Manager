@@ -25,92 +25,73 @@ class TicketModel
     public function createNewTicket(): void
     {
         $currentUser = $this->superGlobals->_SESSION("user")['id'];
-        $req = $this->bdd->prepare("INSERT INTO tickets( author_id, requester, status, creation_date, title, description, group_id ) values (?,?,?, NOW(), ?, ?, ?) ");
-        $req->execute(array($currentUser, $this->superGlobals->_POST("Requester"), "open", $this->superGlobals->_POST("Title"), $this->superGlobals->_POST("Description"), $this->superGlobals->_GET("groupid")));
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
+        $sql = "INSERT INTO `tickets` (`author_id`, `requester`, `status`, `creation_date`, `title`, `description`, `group_id`) VALUES (?, ?, ?, NOW(), ?, ?, ?)";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$currentUser, $this->superGlobals->_POST("Requester"), "open", $this->superGlobals->_POST("Title"), $this->superGlobals->_POST("Description"), $this->superGlobals->_GET("groupid")]);
     }
 
     public function getTicketDetails(int $id): Ticket
     {
-        $req = $this->bdd->prepare("SELECT * FROM tickets WHERE id = '$id' ORDER BY creation_date DESC");
-        $req->execute();
+        $sql = "SELECT * FROM `tickets` WHERE `id` = ? ORDER BY `creation_date` DESC";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$id]);
         $req->setFetchMode(PDO::FETCH_CLASS, Ticket::class);
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
         return $req->fetch();
     }
 
     public function getTicketGroupIdWithTicketId($ticketId): Ticket
     {
-        $req = $this->bdd->prepare("SELECT group_id FROM tickets WHERE id = '$ticketId' ");
-        $req->execute();
+        $sql = "SELECT `group_id` FROM `tickets` WHERE `id` = ?";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$ticketId]);
         $req->setFetchMode(PDO::FETCH_CLASS, Ticket::class);
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
         return $req->fetch();
     }
 
     // GET OPEN TICKET WITH GROUP ID
     public function getOpenTicketsWithGroupId(int $groupId): array
     {
-        $bdd = Database::getBdd();
-        $req = $bdd->prepare("SELECT * FROM tickets WHERE group_id = '$groupId' AND status = 'open' ORDER BY creation_date DESC");
-        $req->execute();
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
-        return $req->fetchall();
+        $sql = "SELECT * FROM `tickets` WHERE `group_id` = ? AND `status` = 'open' ORDER BY `creation_date` DESC";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$groupId]);
+        return $req->fetchAll();
     }
 
     // GET CLOSED TICKET WITH GROUP ID
     public function getClosedTicketsWithGroupId(int $groupId): array
     {
-        $bdd = Database::getBdd();
-        $req = $bdd->prepare("SELECT * FROM tickets WHERE group_id = '$groupId' AND status = 'closed' ORDER BY creation_date DESC");
-        $req->execute();
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
-        return $req->fetchall();
+        $sql = "SELECT * FROM `tickets` WHERE `group_id` = ? AND `status` = 'closed' ORDER BY `creation_date` DESC";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$groupId]);
+        return $req->fetchAll();
     }
-
 
     // CLOSE TICKET
     public function closeTicket(): void
     {
         $status = "closed";
-        $req = $this->bdd->prepare("UPDATE tickets SET status = ?, ticket_status_change_date = NOW() where id = ?");
-        $req->execute(array($status, $this->superGlobals->_GET("ticketid")));
-        // DEBUG
-        // $req->debugDumpParams();
-        // die;
+        $sql = "UPDATE `tickets` SET `status` = ?, `ticket_status_change_date` = NOW() WHERE `id` = ?";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$status, $this->superGlobals->_GET("ticketid")]);
     }
 
     // STATS - GET ALL OPEN TICKETS THIS MONTH
     public function getMyTickets(string $status): array
     {
         $currentUserId = $this->superGlobals->_SESSION("user")['id'];
-        $req = $this->bdd->prepare("SELECT * FROM tickets WHERE author_id = '$currentUserId' AND status = '$status' ORDER BY creation_date DESC");
-        $req->execute();
-        //  $req->debugDumpParams();
-        //  die;
-        return $req->fetchall();
+        $sql = "SELECT * FROM `tickets` WHERE `author_id` = ? AND `status` = ? ORDER BY `creation_date` DESC";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$currentUserId, $status]);
+        return $req->fetchAll();
     }
 
     // STATS - GET ALL OPEN TICKETS THIS MONTH
     public function getMyTicketsForYearAndMonth($CreationYear, $CreationMonth, $status)
     {
         $currentUserId = $this->superGlobals->_SESSION("user")['id'];
-        $req = $this->bdd->prepare("SELECT creation_date FROM tickets WHERE YEAR(creation_date) = '$CreationYear' AND MONTH(creation_date) = '$CreationMonth' AND status = '$status' AND author_id = '$currentUserId' ORDER BY creation_date DESC");
-        $req->execute();
-        //  $req->debugDumpParams();
-        //  die;
-        return $req->fetchall();
+        $sql = "SELECT `creation_date` FROM `tickets` WHERE YEAR(`creation_date`) = ? AND MONTH(`creation_date`) = ? AND `status` = ? AND `author_id` = ? ORDER BY `creation_date` DESC";
+        $req = $this->bdd->prepare($sql);
+        $req->execute([$CreationYear, $CreationMonth, $status, $currentUserId]);
+        return $req->fetchAll();
     }
-
-
 }
